@@ -1,6 +1,12 @@
 # AIEDRL
 A reinforcement learning for optimize AI agents for learning
 
+## Installation
+```bash
+conda env create -f environment.yml
+conda activate rlhf
+```
+
 ## Selected Recent Papers on RL for AI tutors
 
 1. **Dinucu-Jianu, D., Macina, J., Daheim, N., Hakimi, I., Gurevych, I., & Sachan, M. (2025).**  
