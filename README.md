@@ -1,2 +1,6 @@
 # AIEDRL
 A reinforcement learning for optimize AI agents for learning
+
+## Papers:
+- https://arxiv.org/abs/2505.15607
+- https://arxiv.org/abs/2508.00270
