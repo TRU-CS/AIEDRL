@@ -29,5 +29,13 @@ conda activate rlhf
 
 ## Resources
 - https://github.com/eth-lre/PedagogicalRL
-- http://incompleteideas.net/book/the-book-2nd.html
+
+**1. Textbook**  
+- *Reinforcement Learning: An Introduction (Sutton & Barto)*  
+  http://incompleteideas.net/book/the-book-2nd.html
+
+**2. Stanford CS234 — RL Course Syllabus**  
 - https://web.stanford.edu/class/cs234/
+
+**3. Stanford CS234 — Lecture Playlist (YouTube)**  
+- https://youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX
