@@ -25,7 +25,25 @@ conda activate rlhf
    *MathTutorBench: A Benchmark for Measuring Open-Ended Pedagogical Capabilities of LLM Tutors.*  
    [_arXiv:2502.18940_](https://arxiv.org/abs/2502.18940)
 
+5. **Riedmann, A., Schaper, P., & Lugrin, B. (2025).**  
+   *Reinforcement learning in education: A systematic literature review.*  
+   *International Journal of Artificial Intelligence in Education*, 1–55.  
+   [_SpringerLink_](https://link.springer.com/article/10.1007/s40593-025-00494-6)
+   
+6. **Scarlatos, A., Liu, N., Lee, J., Baraniuk, R., & Lan, A. (2025).**  
+   *Training LLM-Based Tutors to Improve Student Learning Outcomes in Dialogues.*  
+   In: Cristea, A. I., Walker, E., Lu, Y., Santos, O. C., & Isotani, S. (eds) **Artificial Intelligence in Education. AIED 2025.**  
+   *Lecture Notes in Computer Science* (Vol. 15877). Springer, Cham.  
+   [_arXiv:2503.06424_](https://arxiv.org/abs/2503.06424)
 
+7. **Wei, S., Zhang, M., Lin, X., Jiang, B., Kuang, K., & Dai, Z. (2025).**  
+   *UCO: A Multi-Turn Interactive Reinforcement Learning Method for Adaptive Teaching with Large Language Models.*  
+   [_arXiv:2511.08873_](https://arxiv.org/abs/2511.08873)
+
+8. **Memarian, B., & Doleck, T. (2024).**  
+   *A scoping review of reinforcement learning in education.*  
+   *Computers and Education: Open*, 100175.  
+   [_https://doi.org/10.1016/j.caeo.2024.100175_](https://doi.org/10.1016/j.caeo.2024.100175)
 
 ## Resources
 - https://github.com/eth-lre/PedagogicalRL
