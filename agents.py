@@ -56,18 +56,25 @@ class MyAgent:
         raise ValueError("No final AIMessage with content found in response. Last message:", type(last_respose_message), last_respose_message)
 
 
-    def _agent_constructor(self):
-        # For simplicity, we return agent with a fixed agent configuration
-        model = ChatOpenAI(
-            model="gpt-4.1-nano",
-            temperature=0.0, # 0.1
-            max_tokens=1000,
-            timeout=30
-            # ... (other params)
-        )
-        agent_tutor = create_agent(model , tools=None)
-        return agent_tutor
+    # def _agent_constructor(self):
+    #     # For simplicity, we return agent with a fixed agent configuration
+    #     model = ChatOpenAI(
+    #         model="gpt-4.1-nano",
+    #         temperature=0.0, # 0.1
+    #         max_tokens=1000,
+    #         timeout=30
+    #         # ... (other params)
+    #     )
+    #     agent_tutor = create_agent(model , tools=None)
+    #     return agent_tutor
 
+    def _agent_constructor(self):
+        agent_student = create_agent(
+            model="gpt-4.1-nano",
+            tools=None,
+            # response_format=StudentOutput,   # <-- structured output
+        )
+        return agent_student
     
 ## TUTORS
 
@@ -102,6 +109,15 @@ class TutorCodeChecking(Tutor):
         pass
 
 ## STUDENTS
+from pydantic import BaseModel, Field
+class StudentOutput(BaseModel):
+    """Student structured output"""
+    conversation: str = Field(
+        description="Student interaction with the tutor"
+    )
+    python_code: str = Field(
+        description="Current student implementation of python solution. Only python code should go here."
+    )
 
 class Student(MyAgent):
     def __init__(self, system_message: str):
@@ -119,3 +135,11 @@ class Student(MyAgent):
         out = self.invoke(message=message)
         pprint(out.content)
         return out
+
+    def _agent_constructor(self):
+        agent_student = create_agent(
+            model="gpt-4.1-nano",
+            tools=None,
+            response_format=StudentOutput,   # <-- structured output
+        )
+        return agent_student
