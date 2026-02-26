@@ -1,8 +1,10 @@
 from pprint import pprint
+from pydantic import BaseModel, Field
 from langchain.agents import create_agent
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
+## BASE CLASS
 class MyAgent:
     def __init__(self, system_message: str):
         self.system_message = system_message
@@ -77,7 +79,6 @@ class MyAgent:
         return agent_student
     
 ## TUTORS
-
 class Tutor(MyAgent):
     def __init__(self, system_message: str):
         super().__init__(system_message)
@@ -109,7 +110,6 @@ class TutorCodeChecking(Tutor):
         pass
 
 ## STUDENTS
-from pydantic import BaseModel, Field
 class StudentOutput(BaseModel):
     """Student structured output"""
     conversation: str = Field(
@@ -143,3 +143,68 @@ class Student(MyAgent):
             response_format=StudentOutput,   # <-- structured output
         )
         return agent_student
+
+## JUDGE STUDENT
+class StudentJudgeOutput(BaseModel):
+    """StudentJudge structured output"""
+    student_level_explanation: str = Field(
+        description="Explain why you chose the value for the student level field."
+    )
+    student_level: int = Field(
+        ge=1,
+        le=4,
+        description="Estimated student proficiency level on a 1–4 scale"
+    )
+class StudentJudge(MyAgent):
+    def __init__(self, system_message: str):
+        super().__init__(system_message)
+
+    def _agent_constructor(self):
+        agent_judge = create_agent(
+            model="gpt-4.1-nano",
+            tools=None,
+            response_format=StudentJudgeOutput,   # <-- structured output
+        )
+        return agent_judge
+
+## JUDGE TUTOR
+class TutorJudgeOutput(BaseModel):
+    tutor_level_explanation: str = Field(
+        description="Explain why you chose the value for the tutor level field."
+    )
+    tutor_level: int = Field(
+        ge=1,
+        le=4,
+        description="Estimated tutor abstraction level on a 1–4 scale"
+    )
+    leakage_explanation: str = Field(
+        description="Explain why leakage was or was not detected."
+    )
+    leakage_detected: bool = Field(
+        description="True if the tutor reveals the final answer or gives away a key solution step."
+    )
+
+class TutorJudge(MyAgent):
+    def __init__(self, system_message: str):
+        super().__init__(system_message)
+
+    def invoke(self, message: AIMessage) -> AIMessage:
+        """
+        Judge receives an AIMessage from the Tutor and responds with an AIMessage.
+        """
+        # avoid referring to TutorJudge by name, which could raise NameError in some contexts
+        ai_response = super().invoke(HumanMessage(content=message.content))
+        return ai_response
+
+    def invoke_pprint(self, message:AIMessage) -> AIMessage:
+        out = self.invoke(message=message)
+        pprint(out.content)
+        return out
+
+    def _agent_constructor(self):
+        agent_judge = create_agent(
+            model="gpt-4.1-nano",
+            tools=None,
+            response_format=TutorJudgeOutput,   # <-- structured output
+        )
+        return agent_judge
