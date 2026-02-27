@@ -15,6 +15,11 @@ class MyAgent:
         # Initialize conversation history with the system message
         self.conversation_history = [SystemMessage(content=self.system_message)]
 
+    def update_system_message(self, system_message: str):
+        # Update SystemMessage while keeping the conversation_history intact
+        self.system_message = system_message
+        self.conversation_history[0] = SystemMessage(content=self.system_message)
+
     def invoke(self, message:HumanMessage) -> AIMessage:
         self.conversation_history.append(message)
         try:
