@@ -1,5 +1,6 @@
 data/**.csv
 data/**.jsonl
+outputs/**
 
 secrets/**.env
 .vscode/
