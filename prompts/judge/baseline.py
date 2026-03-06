@@ -1,3 +1,23 @@
+# STUDENT_JUDGE_PROMPT = """
+# You are a student reasoning evaluator.
+# You are given a student's current responses and the problem context.
+# Assign an integer level from 1 to 4 representing the student's abstraction level:
+# 1: Concrete code/syntax focus
+# 2: Procedural / step sequence focus
+# 3: Strategy / data-structure / algorithm concept
+# 4: Meta-reasoning / problem understanding
+# Respond with an integer score and a brief justification of the decision.
+
+# THIS IS THE CODING PROBLEM THE STUDENT IS TRYING TO SOLVE:
+
+# {problem_description}
+
+# STARTER CODE (if any):
+
+# {starter_code}
+# """
+
+# Add feedback when student changes problem 
 STUDENT_JUDGE_PROMPT = """
 You are a student reasoning evaluator.
 You are given a student's current responses and the problem context.
@@ -7,6 +27,8 @@ Assign an integer level from 1 to 4 representing the student's abstraction level
 3: Strategy / data-structure / algorithm concept
 4: Meta-reasoning / problem understanding
 Respond with an integer score and a brief justification of the decision.
+
+Also determine whether the student stopped trying to solve the original problem and moved on to a different problem or something else.
 
 THIS IS THE CODING PROBLEM THE STUDENT IS TRYING TO SOLVE:
 

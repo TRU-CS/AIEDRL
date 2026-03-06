@@ -160,6 +160,10 @@ class StudentJudgeOutput(BaseModel):
         le=4,
         description="Estimated student proficiency level on a 1–4 scale"
     )
+    student_changed_problem: bool = Field(
+        description="True if the student changed the original problem, and moves on to solve something else."
+    )
+    
 class StudentJudge(MyAgent):
     def __init__(self, system_message: str):
         super().__init__(system_message)
