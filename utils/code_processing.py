@@ -1,6 +1,9 @@
+import ast
+
 import pandas as pd
 from typing import *
 from typing import Literal
+
 from utils.code_dependencies import *
 
 def get_code_definitions(problem_code:str)->str:
@@ -31,22 +34,77 @@ def show_all_dataset_definitions(df:pd.DataFrame)->None:
                 print(definitions)
                 unique_definitions.add(definitions)
 
-def code_runs(code_definitions:str, student_code:str)->bool:
+# Deprecated: Had problems with empty code with only comments.
+# def code_runs(code_definitions:str, student_code:str)->bool:
+#     """
+#     checks wheter the code can run at least
+#     requires:
+#         - 'from typing import *' since typing structures are used everywhere. 
+#         - running dataset definitions before (see above). 
+#     """
+#     if student_code == "":
+#         return False
+    
+#     # code definitions
+#     try: 
+#         exec(code_definitions)
+#     except Exception as e: raise Warning("Problem runnning code definitions!")
+    
+#     try: 
+#         exec(student_code)
+#         return True
+#     except Exception as e:
+#         Warning(f"Student Code Exception {e}")
+#         return False
+
+def code_runs(code_definitions: str, student_code: str) -> bool:
     """
-    checks wheter the code can run at least
-    requires:
-        - 'from typing import *' since typing structures are used everywhere. 
-        - running dataset definitions before (see above). 
+    Checks whether the student's code contains executable statements
+    and runs without raising exceptions.
     """
-    if student_code == "":
+
+    if not student_code.strip():
         return False
-    
-    # code definitions
-    try: 
+
+    # Parse AST to detect meaningful code
+    try:
+        tree = ast.parse(student_code)
+
+        meaningful_nodes = (
+            ast.Assign,
+            ast.AugAssign,
+            ast.AnnAssign,
+            ast.FunctionDef,
+            ast.AsyncFunctionDef,
+            ast.ClassDef,
+            ast.Return,
+            ast.For,
+            ast.While,
+            ast.If,
+            ast.With,
+            ast.Try,
+            ast.Expr,  # may include function calls
+            ast.Import,
+            ast.ImportFrom
+        )
+
+        has_code = any(isinstance(node, meaningful_nodes) for node in ast.walk(tree))
+
+        if not has_code:
+            print("no code")
+            return False
+
+    except SyntaxError:
+        return False
+
+    # Run definitions
+    try:
         exec(code_definitions)
-    except Exception as e: raise Warning("Problem runnning code definitions!")
-    
-    try: 
+    except Exception:
+        raise Warning("Problem running code definitions!")
+
+    # Run student code
+    try:
         exec(student_code)
         return True
     except Exception as e:
