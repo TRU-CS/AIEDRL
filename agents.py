@@ -121,7 +121,7 @@ class StudentOutput(BaseModel):
         description="Student interaction with the tutor"
     )
     python_code: str = Field(
-        description="Current student implementation of python solution. Only python code should go here."
+        description="Current student implementation of python solution. Only python code, no comments."
     )
 
 class Student(MyAgent):
