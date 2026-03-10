@@ -6,7 +6,8 @@ from langchain_openai import ChatOpenAI
 
 # Model configuration
 # MODEL_NAME = "gpt-4.1-nano"
-MODEL_NAME = "gpt-4.1-mini"
+MODEL_STUDENT = "gpt-4.1-mini"
+MODEL_GENERAL = "gpt-4.1"
 
 ## BASE CLASS
 class MyAgent:
@@ -53,7 +54,7 @@ class MyAgent:
 
     def _agent_constructor(self):
         agent_student = create_agent(
-            model=MODEL_NAME,
+            model=MODEL_GENERAL,
             tools=None,
             # response_format=StudentOutput,   # <-- structured output
         )
@@ -93,7 +94,7 @@ class Student(MyAgent):
 
     def _agent_constructor(self):
         agent_student = create_agent(
-            model=MODEL_NAME,
+            model=MODEL_STUDENT,
             tools=None,
             response_format=StudentOutput,   # <-- structured output
         )
@@ -120,7 +121,7 @@ class StudentJudge(MyAgent):
 
     def _agent_constructor(self):
         agent_judge = create_agent(
-            model=MODEL_NAME,
+            model=MODEL_GENERAL,
             tools=None,
             response_format=StudentJudgeOutput,   # <-- structured output
         )
@@ -162,7 +163,7 @@ class TutorJudge(MyAgent):
 
     def _agent_constructor(self):
         agent_judge = create_agent(
-            model=MODEL_NAME,
+            model=MODEL_GENERAL,
             tools=None,
             response_format=TutorJudgeOutput,   # <-- structured output
         )
