@@ -4,6 +4,10 @@ from langchain.agents import create_agent
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
+# Model configuration
+# MODEL_NAME = "gpt-4.1-nano"
+MODEL_NAME = "gpt-4.1-mini"
+
 ## BASE CLASS
 class MyAgent:
     def __init__(self, system_message: str):
@@ -66,7 +70,7 @@ class MyAgent:
     # def _agent_constructor(self):
     #     # For simplicity, we return agent with a fixed agent configuration
     #     model = ChatOpenAI(
-    #         model="gpt-4.1-nano",
+    #         model=MODEL_NAME,
     #         temperature=0.0, # 0.1
     #         max_tokens=1000,
     #         timeout=30
@@ -77,7 +81,7 @@ class MyAgent:
 
     def _agent_constructor(self):
         agent_student = create_agent(
-            model="gpt-4.1-nano",
+            model=MODEL_NAME,
             tools=None,
             # response_format=StudentOutput,   # <-- structured output
         )
@@ -98,7 +102,7 @@ class TutorCodeChecking(Tutor):
     def _agent_constructor(self):
         # For simplicity, we return agent with a fixed agent configuration
         model = ChatOpenAI(
-            model="gpt-4.1-nano",
+            model=MODEL_NAME,
             temperature=0.0, # 0.1
             max_tokens=1000,
             timeout=30
@@ -143,7 +147,7 @@ class Student(MyAgent):
 
     def _agent_constructor(self):
         agent_student = create_agent(
-            model="gpt-4.1-nano",
+            model=MODEL_NAME,
             tools=None,
             response_format=StudentOutput,   # <-- structured output
         )
@@ -170,7 +174,7 @@ class StudentJudge(MyAgent):
 
     def _agent_constructor(self):
         agent_judge = create_agent(
-            model="gpt-4.1-nano",
+            model=MODEL_NAME,
             tools=None,
             response_format=StudentJudgeOutput,   # <-- structured output
         )
@@ -212,7 +216,7 @@ class TutorJudge(MyAgent):
 
     def _agent_constructor(self):
         agent_judge = create_agent(
-            model="gpt-4.1-nano",
+            model=MODEL_NAME,
             tools=None,
             response_format=TutorJudgeOutput,   # <-- structured output
         )
