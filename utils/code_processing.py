@@ -137,3 +137,40 @@ def numeric_test_score(problem, code_definitions:str, student_python_code:str, v
         except: pass
     # return proportion of passed asserts 
     return count_passed / len(asserts)
+
+## NOTE: Deprecated. Attempt to avoid getting stuck using timeout. Didnt work. It seems the issue is not about computational time. 
+# from concurrent.futures import ThreadPoolExecutor, TimeoutError
+# from tqdm import tqdm
+
+# def numeric_test_score(problem, code_definitions: str, student_python_code: str, verbose: Literal[0,1,2]=0, timeout: int = 5):
+#     asserts = problem.test.split("assert")[1:]
+#     asserts = [ass.strip() for ass in asserts]
+#     if verbose > 0: print(asserts)
+
+#     # code definitions (in shared namespace)
+#     namespace = {}
+#     try: 
+#         exec(code_definitions, namespace)
+#     except Exception as e: raise Warning("Problem running code definitions!")
+
+#     count_passed = 0
+#     for idx, ass in tqdm(enumerate(asserts)):
+#         def run_test():
+#             exec(student_python_code, namespace)
+#             assestent_line_code = ass.replace("candidate", problem.entry_point, 1)
+#             return eval(assestent_line_code, namespace)
+        
+#         try:
+#             with ThreadPoolExecutor() as executor:
+#                 evaluation_passed = executor.submit(run_test).result(timeout=timeout)
+#                 if (verbose == 2) or (verbose == 1 and not evaluation_passed):
+#                     print(idx, assestent_line_code)
+#                     print(evaluation_passed, '\n')
+#                 if evaluation_passed:
+#                     count_passed += 1
+#         except TimeoutError:
+#             if verbose > 0: print(f"Test {idx} timed out")
+#         except: 
+#             pass
+    
+#     return count_passed / len(asserts)
