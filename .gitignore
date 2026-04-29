@@ -2,6 +2,12 @@ data/**.csv
 data/**.jsonl
 
 secrets/**.env
+.vscode/
+
+# outputs/**
+!/outputs/
+/outputs/*
+!/outputs/20260315_gpt_4_1_beginner_test2/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

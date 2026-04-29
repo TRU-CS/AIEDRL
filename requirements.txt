@@ -5,3 +5,11 @@ datasets # access Huggingface data
 itables
 langchain>=1.2.7
 langchain-openai
+scikit-learn==1.8.0
+# code dependencies
+sortedcontainers
+# results analysis
+seaborn==0.13.2
+plotly==6.0.0
+nbformat # required by plotly
+kaleido # plotly, for rendering for pdf

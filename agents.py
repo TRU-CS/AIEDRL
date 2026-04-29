@@ -1,8 +1,15 @@
 from pprint import pprint
+from pydantic import BaseModel, Field
 from langchain.agents import create_agent
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
+# Model configuration
+# MODEL_NAME = "gpt-4.1-nano"
+MODEL_STUDENT = "gpt-4.1-mini"
+MODEL_GENERAL = "gpt-4.1"
+
+## BASE CLASS
 class MyAgent:
     def __init__(self, system_message: str):
         self.system_message = system_message
@@ -12,6 +19,11 @@ class MyAgent:
     def reset_conversation(self):
         # Initialize conversation history with the system message
         self.conversation_history = [SystemMessage(content=self.system_message)]
+
+    def update_system_message(self, system_message: str):
+        # Update SystemMessage while keeping the conversation_history intact
+        self.system_message = system_message
+        self.conversation_history[0] = SystemMessage(content=self.system_message)
 
     def invoke(self, message:HumanMessage) -> AIMessage:
         self.conversation_history.append(message)
@@ -29,21 +41,6 @@ class MyAgent:
         pprint(out.content)
         return out
 
-    # Deprecated?? See below. 
-    # def _get_final_message(self, response: dict) -> AIMessage:
-    #     """
-    #     Extract the final user-facing AI response from a LangChain-style run output.
-    #     Safely skips tool-call placeholders and returns the last meaningful AIMessage.
-    #     """
-    #     print("types:", [type(message)  for message in response["messages"]])
-    #     messages = response.get("messages", [])
-
-    #     for msg in reversed(messages):
-    #         if isinstance(msg, AIMessage) and msg.content:
-    #             return msg
-
-    #     raise ValueError("No final AIMessage with content found in response.")
-
     def _get_final_message(self, response: dict) -> AIMessage: # Edit: Makes easier to detect errors in case the output is not as expected. 
         """
         Extract the final user-facing AI response from a LangChain-style run output.
@@ -55,53 +52,28 @@ class MyAgent:
             return last_respose_message
         raise ValueError("No final AIMessage with content found in response. Last message:", type(last_respose_message), last_respose_message)
 
-
     def _agent_constructor(self):
-        # For simplicity, we return agent with a fixed agent configuration
-        model = ChatOpenAI(
-            model="gpt-4.1-nano",
-            temperature=0.0, # 0.1
-            max_tokens=1000,
-            timeout=30
-            # ... (other params)
+        agent_student = create_agent(
+            model=MODEL_GENERAL,
+            tools=None,
+            # response_format=StudentOutput,   # <-- structured output
         )
-        agent_tutor = create_agent(model , tools=None)
-        return agent_tutor
-
+        return agent_student
     
 ## TUTORS
-
 class Tutor(MyAgent):
     def __init__(self, system_message: str):
         super().__init__(system_message)
 
-class TutorCodeChecking(Tutor):
-    """
-    TODO: Finish tool to Check Code.
-    """
-    def __init__(self, system_message: str):
-        super().__init__(system_message)
-
-    def _agent_constructor(self):
-        # For simplicity, we return agent with a fixed agent configuration
-        model = ChatOpenAI(
-            model="gpt-4.1-nano",
-            temperature=0.0, # 0.1
-            max_tokens=1000,
-            timeout=30
-            # ... (other params)
-        )
-        agent_tutor = create_agent(model , tools=[self.check_code])
-        return agent_tutor
-
-    def check_code(self, code: str) -> str:
-        """
-        TODO: Implement code checking logic using the agent. 
-        Function takes python code from the agent, checks it for correctness, and returns output.
-        """
-        pass
-
 ## STUDENTS
+class StudentOutput(BaseModel):
+    """Student structured output"""
+    conversation: str = Field(
+        description="Student interaction with the tutor"
+    )
+    python_code: str = Field(
+        description="Current student implementation of python solution. Only python code, no comments."
+    )
 
 class Student(MyAgent):
     def __init__(self, system_message: str):
@@ -119,3 +91,80 @@ class Student(MyAgent):
         out = self.invoke(message=message)
         pprint(out.content)
         return out
+
+    def _agent_constructor(self):
+        agent_student = create_agent(
+            model=MODEL_STUDENT,
+            tools=None,
+            response_format=StudentOutput,   # <-- structured output
+        )
+        return agent_student
+
+## JUDGE STUDENT
+class StudentJudgeOutput(BaseModel):
+    """StudentJudge structured output"""
+    student_level_explanation: str = Field(
+        description="Explain why you chose the value for the student level field."
+    )
+    student_level: int = Field(
+        ge=1,
+        le=4,
+        description="Estimated student proficiency level on a 1–4 scale"
+    )
+    student_changed_problem: bool = Field(
+        description="True if the student changed the original problem, and moves on to solve something else."
+    )
+    
+class StudentJudge(MyAgent):
+    def __init__(self, system_message: str):
+        super().__init__(system_message)
+
+    def _agent_constructor(self):
+        agent_judge = create_agent(
+            model=MODEL_GENERAL,
+            tools=None,
+            response_format=StudentJudgeOutput,   # <-- structured output
+        )
+        return agent_judge
+
+## JUDGE TUTOR
+class TutorJudgeOutput(BaseModel):
+    tutor_level_explanation: str = Field(
+        description="Explain why you chose the value for the tutor level field."
+    )
+    tutor_level: int = Field(
+        ge=1,
+        le=4,
+        description="Estimated tutor abstraction level on a 1–4 scale"
+    )
+    leakage_explanation: str = Field(
+        description="Explain why leakage was or was not detected."
+    )
+    leakage_detected: bool = Field(
+        description="True if the tutor reveals the final answer or gives away a key solution step."
+    )
+
+class TutorJudge(MyAgent):
+    def __init__(self, system_message: str):
+        super().__init__(system_message)
+
+    def invoke(self, message: AIMessage) -> AIMessage:
+        """
+        Judge receives an AIMessage from the Tutor and responds with an AIMessage.
+        """
+        # avoid referring to TutorJudge by name, which could raise NameError in some contexts
+        ai_response = super().invoke(HumanMessage(content=message.content))
+        return ai_response
+
+    def invoke_pprint(self, message:AIMessage) -> AIMessage:
+        out = self.invoke(message=message)
+        pprint(out.content)
+        return out
+
+    def _agent_constructor(self):
+        agent_judge = create_agent(
+            model=MODEL_GENERAL,
+            tools=None,
+            response_format=TutorJudgeOutput,   # <-- structured output
+        )
+        return agent_judge
